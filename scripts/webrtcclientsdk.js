@@ -2,7 +2,6 @@
 define(function (require) {
 console.log("(webrtcclientsdk.js) client Ref Design loading...");
     var _       			= require('underscore');
-    var Q 					= require('q');
     var $					= require('jquery');
 
     var defaultRTCParams 	= require("scripts/defaultRTCParams");
@@ -77,7 +76,7 @@ console.log("(webrtcclientsdk.js) client Ref Design loading...");
 		if(options.evtContentShareStateChange){
 			cbContentShareStateChange = options.evtContentShareStateChange;
 		}
-
+		console.log("RTCMananager = ", BJN)
         BJN.RTCManager.setBandwidth(options.bandWidth);
 		MediaStarted = false;
 		startLocalStream();
@@ -97,7 +96,7 @@ console.log("(webrtcclientsdk.js) client Ref Design loading...");
 	// stream[0] - local audio stream
 	// stream[1] - local video stream
     var startLocalStream = function() {
-
+		console.log("start local stream")
         var streamType = 'local_stream';
         if(MediaStarted)
         	streamType = 'preview_stream';
@@ -107,7 +106,8 @@ console.log("(webrtcclientsdk.js) client Ref Design loading...");
         RTCManager.getLocalMedia(mediaConstraints, 'local_stream').then(function(stream) {
             BJN.localAudioStream = stream[0];
             BJN.localVideoStream = stream[1];
-*/
+*/	
+			console.log("got media stream == ",stream)
 
 //---------- New for Firefox ------------------
 			for (var i = 0; i < stream.length; i++) {

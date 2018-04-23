@@ -1,16 +1,16 @@
 requirejs.config({
     baseUrl: '',
-
     paths: {
-       "webrtc-sdk" : "./external/webrtcsdk.min",
-       jquery: './external/jquery',
-       underscore: './external/lodash'
+       "webrtc-sdk" : "./external/webrtcSdk",
+       jquery: './external/jquery.min',
+       underscore: './external/lodash.min'
     }
 });
 
-require(["webrtc-sdk"], function () {
-    console.log("(require): webrtcsdk.min loaded");
-    require(['example'], function() {
-        console.log("(require): example webrtc client app loaded");
-    });
+require(['example'], function() {
+    console.log("(require): example webrtc client app loaded");
 });
+
+// require(['consumer.require'], function() {
+//     console.log("(require): consumer webrtc client app loaded");
+// });

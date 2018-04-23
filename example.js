@@ -2,7 +2,7 @@ define([
 	"jquery",
 	"underscore",
 
-    "WebRTC_SDK/RTCManager",
+    "webrtc-sdk",
 
     // Sample App src files
     "scripts/defaultRTCParams",
@@ -43,6 +43,7 @@ define([
 		BJN.RTCManager.getLocalDevices().then(function(devices) {
 			BJN.localDevices = devices.available;
 			var avail = devices.available
+			console.log("Got local devices, available = ",devices)
 			console.log("Got local devices, available:" + JSON.stringify(avail).substr(0,35)+"...");
 			
 			// Add audio in devices to the selection list
