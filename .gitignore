@@ -1,2 +1,4 @@
 external/webrtcsdk.js
 *.yml
+dist/*
+node_modules/

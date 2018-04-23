@@ -1,0 +1,24 @@
+{
+  "name": "sdk-webrtc-meetings",
+  "version": "1.0.0",
+  "description": "![BlueJeans](./media/927.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluejeans/sdk-webrtc-meetings.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bluejeans/sdk-webrtc-meetings/issues"
+  },
+  "homepage": "https://github.com/bluejeans/sdk-webrtc-meetings#readme",
+  "devDependencies": {
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15"
+  }
+}
