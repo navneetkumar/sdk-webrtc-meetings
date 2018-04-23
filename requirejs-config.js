@@ -7,10 +7,10 @@ requirejs.config({
     }
 });
 
-require(['example'], function() {
+// require(['example'], function() {
+//     console.log("(require): example webrtc client app loaded");
+// });
+
+require(['example-umd'], function() {
     console.log("(require): example webrtc client app loaded");
 });
-
-// require(['consumer.require'], function() {
-//     console.log("(require): consumer webrtc client app loaded");
-// });

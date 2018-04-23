@@ -1,5 +1,6 @@
 define(function (require) {
-    console.log("loading index..");
+
+    console.log("Starting SDK Interface");
 
     var defaultRTCParams = {
         peerConfig: {
@@ -19,7 +20,8 @@ define(function (require) {
         }
     };
    
-    var Manager = require("webrtc-sdk");
+    var RTCManager = require("webrtc-sdk");
+
     var config = {
         muteParams: {
             localAudio: false,
@@ -48,6 +50,7 @@ define(function (require) {
 
         init() {
             this.manager.getLocalDevices().then((devices) => {
+                console.log("Found devices  = ", devices)
                 this.localDevices = devices.available;
                 this.initialize()
 
@@ -57,12 +60,11 @@ define(function (require) {
         }
  
         setupManager() {
-            this.manager = new Manager({
+            this.manager = new RTCManager({
                 webrtcParams: defaultRTCParams,
-                bjnCloudTimeout: 5000,
-                bjnSIPTimeout: 3000,
-                bjnWebRTCReconnectTimeout: 90000
-            });
+                bjnCloudTimeout : 5000,
+                bjnSIPTimeout : 3000,
+                bjnWebRTCReconnectTimeout : 90000});
         }
 
         initialize() {   
@@ -71,23 +73,22 @@ define(function (require) {
             this.startLocalStream();
             
             // get hooks to RTCManager callbacks
-            this.manager.localVideoStreamChange = this.updateSelfView;
-            this.manager.localAudioStreamChange = this.updateAudioPath;
-            this.manager.remoteEndPointStateChange = this.nRemoteConnectionStateChange;
-            this.manager.localEndPointStateChange = this.onLocalConnectionStateChange;
-            this.manager.remoteStreamChange = this.onRemoteStreamUpdated;
-            this.manager.error = this.onRTCError;
-            this.manager.contentStreamChange = this.onContentShareStateChange;
+            // this.manager.localVideoStreamChange = this.updateSelfView;
+            // this.manager.localAudioStreamChange = this.updateAudioPath;
+            // this.manager.remoteEndPointStateChange = this.nRemoteConnectionStateChange;
+            // this.manager.localEndPointStateChange = this.onLocalConnectionStateChange;
+            // this.manager.remoteStreamChange = this.onRemoteStreamUpdated;
+            // this.manager.error = this.onRTCError;
+            // this.manager.contentStreamChange = this.onContentShareStateChange;
         };
     
         startLocalStream() {
-            console.log("starting local stream");
-
+            console.log("[starting local stream]");
             var streamType = 'local_stream';
             if (this.mediaStarted)
                 streamType = 'preview_stream';
-    
             this.manager.getLocalMedia(mediaConstraints, streamType).then((stream) => {
+                console.log("Found Local mediastreams = ", stream)
                 for (var i = 0; i < stream.length; i++) {
                     if (stream[i].bjn_label === "local_audio_stream") {
                         this.localAudioStream = stream[i]
@@ -95,7 +96,6 @@ define(function (require) {
                         this.localVideoStream = stream[i];
                     }
                 }
-    
                 this.updateSelfView(this.localVideoStream);
                 this.mediaStarted = true;
                 if (this.options.evtVideoUnmute)
@@ -106,6 +106,7 @@ define(function (require) {
         };
     
         updateSelfView(localStream) {
+            console.log("self view update")
             if (localStream) {
                 this.manager.renderSelfView({
                     stream: localStream,
