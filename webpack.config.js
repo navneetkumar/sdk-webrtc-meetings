@@ -1,11 +1,19 @@
 var path = require('path');
 
 module.exports = {
-  entry: './src/index.js',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'webpack-numbers.js',
-    library: 'webpackNumbers',
-    libraryTarget: 'commonjs2'
-  }
+    entry: './src/index.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bjn-sdk.js',
+        library: 'BJN',
+        libraryTarget: 'umd'
+    },
+    resolve: {
+        modules: [
+            'src/**/*.js',
+            'node_modules',
+            path.resolve('./src')
+        ],
+
+    }
 };

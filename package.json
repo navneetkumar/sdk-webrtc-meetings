@@ -20,5 +20,10 @@
   "devDependencies": {
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.15"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "q": "^1.5.1",
+    "underscore": "^1.9.0"
   }
 }
