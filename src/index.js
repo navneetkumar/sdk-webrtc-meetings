@@ -13,40 +13,40 @@ define(function (require) {
                 forceTurn: false
             },
             peerConnectionConstraints: {
-                optional: [
-                    {DtlsSrtpKeyAgreement: true}
-                ]
+                optional: [{
+                    DtlsSrtpKeyAgreement: true
+                }]
             }
         }
     };
-   
+
     var RTCManager = require("webrtc-sdk");
 
-    var config = {
-        muteParams: {
-            localAudio: false,
-            localVideo: false
-        }
-    };
-    
     const sdkVersion = {
         major: 1,
         minor: 1,
         build: 0
     };
-    
-    var mediaConstraints = {
-        audio: {},
-        video: {}
-    };
-       
-    class Client {
+
+    class BJNClient {
         constructor(options) {
             this.options = options || {};
             this.defaultRTCParams = defaultRTCParams
             this.mediaStarted = false
+            this.mediaConstraints = {
+                audio: {},
+                video: {}
+            };
+            this.config = {
+                muteParams: {
+                    localAudio: false,
+                    localVideo: false
+                }
+            };
             this.setupManager()
         }
+
+        static get version() { return sdkVersion; }
 
         init() {
             this.manager.getLocalDevices().then((devices) => {
@@ -54,40 +54,41 @@ define(function (require) {
                 this.localDevices = devices.available;
                 this.initialize()
 
-            }).catch((error) =>{
+            }).catch((error) => {
                 console.log("Local device error " + error);
             })
         }
- 
+
         setupManager() {
             this.manager = new RTCManager({
                 webrtcParams: defaultRTCParams,
-                bjnCloudTimeout : 5000,
-                bjnSIPTimeout : 3000,
-                bjnWebRTCReconnectTimeout : 90000});
+                bjnCloudTimeout: 5000,
+                bjnSIPTimeout: 3000,
+                bjnWebRTCReconnectTimeout: 90000
+            });
         }
 
-        initialize() {   
+        initialize() {
             this.manager.setBandwidth(this.options.bandWidth);
             this.mediaStarted = false;
             this.startLocalStream();
-            
+
             // get hooks to RTCManager callbacks
-            // this.manager.localVideoStreamChange = this.updateSelfView;
-            // this.manager.localAudioStreamChange = this.updateAudioPath;
-            // this.manager.remoteEndPointStateChange = this.nRemoteConnectionStateChange;
-            // this.manager.localEndPointStateChange = this.onLocalConnectionStateChange;
-            // this.manager.remoteStreamChange = this.onRemoteStreamUpdated;
-            // this.manager.error = this.onRTCError;
-            // this.manager.contentStreamChange = this.onContentShareStateChange;
+            this.manager.localVideoStreamChange = this.updateSelfView.bind(this);
+            this.manager.localAudioStreamChange = this.updateAudioPath.bind(this);
+            this.manager.remoteEndPointStateChange = this.nRemoteConnectionStateChange.bind(this);
+            this.manager.localEndPointStateChange = this.onLocalConnectionStateChange.bind(this);
+            this.manager.remoteStreamChange = this.onRemoteStreamUpdated.bind(this);
+            this.manager.error = this.onRTCError.bind(this);
+            this.manager.contentStreamChange = this.onContentShareStateChange.bind(this);
         };
-    
+
         startLocalStream() {
             console.log("[starting local stream]");
             var streamType = 'local_stream';
             if (this.mediaStarted)
                 streamType = 'preview_stream';
-            this.manager.getLocalMedia(mediaConstraints, streamType).then((stream) => {
+            this.manager.getLocalMedia(this.mediaConstraints, streamType).then((stream) => {
                 console.log("Found Local mediastreams = ", stream)
                 for (var i = 0; i < stream.length; i++) {
                     if (stream[i].bjn_label === "local_audio_stream") {
@@ -100,11 +101,11 @@ define(function (require) {
                 this.mediaStarted = true;
                 if (this.options.evtVideoUnmute)
                     this.options.evtVideoUnmute();
-            },(err) => {
+            }, (err) => {
                 console.log("getLocalMedia error:\n" + JSON.stringify(err, null, 2));
             });
         };
-    
+
         updateSelfView(localStream) {
             console.log("self view update")
             if (localStream) {
@@ -117,91 +118,86 @@ define(function (require) {
             } else
                 console.log("updateSelfView no stream!!!");
         };
-    
+
         // Callback when audio stream changes.  update GUI if stream is defined	
         updateAudioPath(localStream) {
             if (localStream) {
                 console.log("Audio Path Change");
             }
         };
-    
-    
+
+
         changeAudioInput(who) {
-            var dev = BJN.localDevices.audioIn[who].id;
+            var dev = this.localDevices.audioIn[who].id;
             console.log("Audio Input is changed: " + dev);
-            mediaConstraints.audio.deviceId = dev;
+            this.mediaConstraints.audio.deviceId = dev;
             this.manager.stopLocalStreams();
-            startLocalStream();
+            this.startLocalStream();
         };
-    
+
         changeVideoInput(who) {
-            var dev = BJN.localDevices.videoIn[who].id;
+            var dev = this.localDevices.videoIn[who].id;
             console.log("Video Input is changed: " + dev);
-            mediaConstraints.video.deviceId = dev;
+            this.mediaConstraints.video.deviceId = dev;
             this.manager.stopLocalStreams();
-            startLocalStream();
+            this.startLocalStream();
         };
-    
+
         changeAudioOutput(who) {
-            var dev = BJN.localDevices.audioOut[who].id;
+            var dev = this.localDevices.audioOut[who].id;
             console.log("Audio Output is changed: " + dev);
             this.manager.setSpeaker({
                 speakerId: dev,
                 mediaElements: [this.options.remoteVideoEl]
             });
         };
-    
+
         setVideoBandwidth(bw) {
             console.log("Video BW is changed: " + bw);
             this.manager.setBandwidth(bw);
         };
-    
+
         toggleAudioMute(event) {
-            var audioMuted = config.muteParams.localAudio ? true : false;
-            config.muteParams.localAudio = !audioMuted;
-            this.manager.muteStreams(config.muteParams);
+            var audioMuted = this.config.muteParams.localAudio ? true : false;
+            this.config.muteParams.localAudio = !audioMuted;
+            this.manager.muteStreams(this.config.muteParams);
             return !audioMuted;
         };
-    
+
         toggleVideoMute(event) {
-            var videoMuted = config.muteParams.localVideo ? true : false;
-            config.muteParams.localVideo = !videoMuted;
-            this.manager.muteStreams(config.muteParams);
+            var videoMuted = this.config.muteParams.localVideo ? true : false;
+            this.config.muteParams.localVideo = !videoMuted;
+            this.manager.muteStreams(this.config.muteParams);
             return !videoMuted;
         };
-    
-        setVolume() {}
-    
-    
-    
+
         joinMeeting(meetingParams) {
             if ((meetingParams.numericMeetingId != "") && (meetingParams.displayName != "")) {
                 console.log("*** Joining meeting id: " + meetingParams.numericMeetingId);
                 this.manager.startMeeting(meetingParams);
             }
         };
-    
+
         // End the meeting
         leaveMeeting(event) {
             this.manager.endMeeting();
             console.log("Leaving meeting");
-            
         };
-    
-    
+
+
         onRemoteConnectionStateChange(state) {
             console.log('Remote Connection state :: ' + state);
             if (this.options.evtRemoteConnectionStateChange) this.options.evtRemoteConnectionStateChange(state);
         };
-    
+
         onLocalConnectionStateChange(state) {
             console.log('Local Connection state :: ' + state);
             if (this.options.evtLocalConnectionStateChange) this.options.evtLocalConnectionStateChange(state);
         };
-    
+
         onRemoteStreamUpdated(stream) {
-            BJN.remoteStream = stream;
-            if (stream) {
+            this.remoteStream = stream;
+            if (this.remoteStream) {
                 console.log('Remote stream updated');
                 this.manager.renderStream({
                     stream: BJN.remoteStream,
@@ -209,25 +205,25 @@ define(function (require) {
                 });
             }
         };
-    
+
         onContentShareStateChange(isSharing) {
             if (this.options.evtContentShareStateChange) {
                 this.options.evtContentShareStateChange(isSharing);
             }
         };
-    
+
         //Add code to handle error from BJN SDK
         onRTCError(error) {
             console.log("Error has occured :: " + error);
             leaveMeeting();
             if (this.options.evtOnError) this.options.evtOnError(error);
-    
+
         };
-    
+
         reportSdkVersion() {
             return sdkVersion;
         };
     }
 
-    return Client;
+    return BJNClient;
 })
