@@ -44,9 +44,14 @@ define(function (require) {
                 }
             };
             this.setupManager()
+            if(!this.options.onMediaEvent) {
+                this.options.onMediaEvent = function() {}
+            }
         }
 
-        static get version() { return sdkVersion; }
+        static get version() {
+            return sdkVersion;
+        }
 
         init() {
             this.manager.getLocalDevices().then((devices) => {
@@ -66,6 +71,8 @@ define(function (require) {
                 bjnSIPTimeout: 3000,
                 bjnWebRTCReconnectTimeout: 90000
             });
+            this.controller = this.manager.rtcController;
+            this.updatePeerStream =  this.controller.peerConnectionManager.updatePeerStream;
         }
 
         initialize() {
@@ -186,20 +193,28 @@ define(function (require) {
 
 
         onRemoteConnectionStateChange(state) {
-            console.log('Remote Connection state :: ' + state);
+            console.error('Remote Connection state :: ' + state);
             if (this.options.evtRemoteConnectionStateChange) this.options.evtRemoteConnectionStateChange(state);
+            var data = { state: state}
+            this.options.onMediaEvent('remoteConnection', data)
         };
 
         onLocalConnectionStateChange(state) {
             console.log('Local Connection state :: ' + state);
             if (this.options.evtLocalConnectionStateChange) this.options.evtLocalConnectionStateChange(state);
+            var data = { state: state}
+            this.options.onMediaEvent('callState', data)
         };
 
         onRemoteStreamUpdated(stream) {
-            console.info('========Remote stream===========');
+            console.error('========Remote stream===========', stream);
             this.remoteStream = stream;
             if (this.remoteStream) {
                 console.log('Remote stream updated');
+                var data = {
+                        remoteStream: this.remoteStream
+                    };
+                this.options.onMediaEvent('remoteStream', data)
                 this.manager.renderStream({
                     stream: this.remoteStream,
                     el: this.options.remoteVideoEl

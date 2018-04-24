@@ -8,13 +8,17 @@ define(["jquery", "src/index"], function($,BJNClient) {
 	$("#toggleVideoMute, #toggleAudioMute").click(function(){
 		$(this).toggleClass("muted");
     });
-    
+	
+	var onMediaEvent = function(type, data) {
+		console.error("[Event]:  Recieved Media Event  = ", type, data)
+	}
     
     initializeSDK = function() {
         var options = {
             localVideoEl: $("#localVideo")[0],
             remoteVideoEl: $("#remoteVideo")[0],
-            bandWidth: "512"
+			bandWidth: "512",
+			onMediaEvent: onMediaEvent
         }
 
         console.log("BJN Client Version = ", BJNClient.version)
