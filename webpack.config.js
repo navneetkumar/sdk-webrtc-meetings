@@ -5,15 +5,17 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bjn-sdk.js',
-        library: 'BJN',
+        library: 'BJNClient',
         libraryTarget: 'umd'
     },
     resolve: {
+        alias: {
+            "webrtc-sdk" : path.resolve(__dirname, 'external/webrtcSdk')
+        },
         modules: [
             'src/**/*.js',
             'node_modules',
             path.resolve('./src')
         ],
-
     }
 };
