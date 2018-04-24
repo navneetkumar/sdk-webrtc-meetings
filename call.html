@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebRTC SDK Sample App</title>
+    <style>
+        div#media {
+            overflow: hidden;
+        }
+
+        video {
+            margin: auto;
+            display: block;
+            vertical-align: middle;
+            width: 98%;
+            background: #444;
+            text-align: center;
+            z-index: -1;
+        }
+
+        .videodiv {
+            float: left;
+            width: 50%;
+        }
+
+        .contentdiv {
+            width: 100%;
+        }
+
+        #localVideo {
+            float: right;
+            border-radius: 0px 0px 5px 5px;
+        }
+
+        #remoteVideo {
+            float: left;
+            border-radius: 0px 0px 5px 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <section>
+            <div id="media">
+                <div class="videodiv remotevid">
+                    <p class="vidtitle remvidtitle">Remote Video</p>
+                    <video id="remoteVideo"></video>
+                </div>
+                <div class="videodiv localvid">
+                    <div>
+                        <p class="vidtitle locvidtitle">Local Video</p>
+                    </div>
+                    <video id="localVideo"></video>
+                </div>
+            </div>
+        </section>
+        <section style="padding-top: 0px;">
+            <div class="userMedia" id="joinMeetingControls">
+                <fieldset>
+                    <div class="control-btn-row">
+                        <button class="controls" id="joinMeeting">Join Meeting</button>
+                        <button class="controls hidden" id="leaveMeeting">End Meeting</button>
+                    </div>
+            </div>
+            </fieldset>
+    </div>
+    <div class="clear"></div>
+    </section>
+    </div>
+    <script src="external/jquery.min.js"></script>
+    <script src="dist/bjn-sdk.js"></script>
+    <script src="call-manager.js"></script>
+</body>
+
+</html>
