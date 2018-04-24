@@ -76,7 +76,7 @@ define(function (require) {
             // get hooks to RTCManager callbacks
             this.manager.localVideoStreamChange = this.updateSelfView.bind(this);
             this.manager.localAudioStreamChange = this.updateAudioPath.bind(this);
-            this.manager.remoteEndPointStateChange = this.nRemoteConnectionStateChange.bind(this);
+            this.manager.remoteEndPointStateChange = this.onRemoteConnectionStateChange.bind(this);
             this.manager.localEndPointStateChange = this.onLocalConnectionStateChange.bind(this);
             this.manager.remoteStreamChange = this.onRemoteStreamUpdated.bind(this);
             this.manager.error = this.onRTCError.bind(this);
@@ -196,11 +196,12 @@ define(function (require) {
         };
 
         onRemoteStreamUpdated(stream) {
+            console.info('========Remote stream===========');
             this.remoteStream = stream;
             if (this.remoteStream) {
                 console.log('Remote stream updated');
                 this.manager.renderStream({
-                    stream: BJN.remoteStream,
+                    stream: this.remoteStream,
                     el: this.options.remoteVideoEl
                 });
             }
@@ -212,7 +213,6 @@ define(function (require) {
             }
         };
 
-        //Add code to handle error from BJN SDK
         onRTCError(error) {
             console.log("Error has occured :: " + error);
             leaveMeeting();
