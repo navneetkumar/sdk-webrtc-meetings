@@ -21,6 +21,7 @@ define(function (require) {
     };
 
     var RTCManager = require("webrtc-sdk");
+    const EventEmitter = require("wolfy87-eventemitter");
 
     const sdkVersion = {
         major: 1,
@@ -28,8 +29,19 @@ define(function (require) {
         build: 0
     };
 
-    class BJNClient {
+    const EVENTS = {
+        media : {
+            remoteConnectionChanged: "remoteConnectionChanged",
+            callStateChanged: "callState",
+            remoteStreamUpdated: "remoteStreamUpdated",
+            error: "error"
+        }
+    }
+
+    class BJNClient extends EventEmitter {
         constructor(options) {
+            super();
+            this.events = EVENTS;
             this.options = options || {};
             this.defaultRTCParams = defaultRTCParams
             this.mediaStarted = false
@@ -44,9 +56,6 @@ define(function (require) {
                 }
             };
             this.setupManager()
-            if(!this.options.onMediaEvent) {
-                this.options.onMediaEvent = function() {}
-            }
         }
 
         static get version() {
@@ -196,14 +205,14 @@ define(function (require) {
             console.error('Remote Connection state :: ' + state);
             if (this.options.evtRemoteConnectionStateChange) this.options.evtRemoteConnectionStateChange(state);
             var data = { state: state}
-            this.options.onMediaEvent('remoteConnection', data)
+            this.emit(this.events.media.remoteConnection, data);
         };
 
         onLocalConnectionStateChange(state) {
             console.log('Local Connection state :: ' + state);
             if (this.options.evtLocalConnectionStateChange) this.options.evtLocalConnectionStateChange(state);
-            var data = { state: state}
-            this.options.onMediaEvent('callState', data)
+            var data = { state: state }
+            this.emit(this.events.media.callStateChanged, data)
         };
 
         onRemoteStreamUpdated(stream) {
@@ -214,7 +223,7 @@ define(function (require) {
                 var data = {
                         remoteStream: this.remoteStream
                     };
-                this.options.onMediaEvent('remoteStream', data)
+                this.emit(this.events.media.remoteStreamUpdated, data)
                 this.manager.renderStream({
                     stream: this.remoteStream,
                     el: this.options.remoteVideoEl

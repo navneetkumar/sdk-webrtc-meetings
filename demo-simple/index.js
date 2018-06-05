@@ -9,6 +9,15 @@ const options = {
 }
 
 window.bjnClient = new BJNClient(options);
+
+bjnClient.on(bjnClient.events.media.callStateChanged, function(data) {
+    console.log("============> call state changed  = ", data)
+})
+
+bjnClient.on(bjnClient.events.media.remoteStreamUpdated, function(data) {
+    console.log("============> remote stream updated  = ", data)
+}) 
+
 bjnClient.init()
 
 $("#joinMeeting").click(function () {
