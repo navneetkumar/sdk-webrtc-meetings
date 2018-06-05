@@ -1,6 +1,5 @@
 console.log("BJN SDK Version = ", BJNClient.version)
 const meetingId = "600060006"
-const passcode = "6000"
 const name = "Blue"
 
 const options = {
@@ -23,7 +22,6 @@ bjnClient.init()
 $("#joinMeeting").click(function () {
     var meetingParams = {
         numericMeetingId: meetingId,
-        attendeePasscode: passcode,
         displayName: name
     };
     bjnClient.joinMeeting(meetingParams);
